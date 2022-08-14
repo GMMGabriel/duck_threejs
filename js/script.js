@@ -29,13 +29,13 @@ const pivot_body = new THREE.Group();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth - div_actions_width, window.innerHeight - (div_actions_width/2));
+renderer.setSize(window.innerWidth - div_actions_width, window.innerHeight - (div_actions_width / 2));
 document.body.appendChild(renderer.domElement);
 
 // CABEÇA
 const geometry_head = new THREE.CapsuleGeometry(1, 0, 100, 100);
 geometry_head.translate(0, 0, 0,);
-// const material_head = new THREE.MeshBasicMaterial({ color: 0x771133 });
+// const material_head = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
 const material_head = new THREE.MeshBasicMaterial({ color: 0xEFEFEF });
 const head = new THREE.Mesh(geometry_head, material_head);
 pivot_head.add(head);
@@ -231,37 +231,54 @@ function restart() {
   left_leg.rotation.x = right_leg.rotation.x = 0;
   pivot_all.rotation.z = 0;
 
-  // redefine a rotação dos objetos de referência
+  // Redefine a rotação dos objetos de referência
   mesh_legs_ref_geometry.rotation.x = 0;
   mesh_wings_ref_geometry.rotation.x = 0;
   mesh_duckbill_ref_geometry.rotation.x = 0;
+
+  // Redefine a rotação do corpo como um todo
+  pivot_all.rotation.y = 0.7;
+  pivot_all.rotation.x = 0;
 
   // Renderiza para mostrar a redefinição
   renderer.render(scene, camera);
 }
 
+let currentX = 0;
+let currentY = 0;
+let mouseDown = false;
+document.body.addEventListener("mousemove", (e) => {
+  if (mouseDown && e.target != document.querySelector('.actions')) {
+    pivot_all.rotation.y -= (currentX - e.pageX) / 100;
+    pivot_all.rotation.x -= (currentY - e.pageY) / 100;
+    currentX = e.pageX;
+    currentY = e.pageY;
+  }
+  renderer.render(scene, camera);
+})
+document.body.addEventListener("mousedown", (e) => {
+  if (e.target != document.querySelector('.actions')) {
+    mouseDown = true;
+    currentX = e.pageX;
+    currentY = e.pageY;
+  }
+})
+document.body.addEventListener("mouseup", (e) => {
+  if (e.target != document.querySelector('.actions')) {
+    mouseDown = false;
+  }
+})
+
 pivot_all.rotation.y = 0.7;
-pivot_all.rotation.x = 0.1;
-
-// pivot_all.rotation.y = 0.3;
-// pivot_all.rotation.x = 0.3;
-
-// pivot_all.rotation.y = 1.5;
-// pivot_all.rotation.x = -0.3;
-
-// pivot_all.rotation.x = 1.5;
+pivot_all.rotation.x = 0;
+pivot_all.position.y = -0.8;
 
 pivot_head.add(pivot_duckbill);
 pivot_all.add(pivot_head);
 pivot_all.add(pivot_body);
-pivot_all.position.y = -0.8;
-
-// pivot_all.rotation.z = 1;
 
 scene.add(pivot_all);
 
-// camera.position.y = 0.8;
-// camera.position.y = 1.8;
 camera.position.z = 6;
-// duck_animation();
+
 renderer.render(scene, camera);
