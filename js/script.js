@@ -240,6 +240,9 @@ function restart() {
   pivot_all.rotation.y = 0.7;
   pivot_all.rotation.x = 0;
 
+  // Coloca a câmera de volta no lugar, eixo z (zoom)
+  camera.position.z = 6;
+
   // Renderiza para mostrar a redefinição
   renderer.render(scene, camera);
 }
@@ -248,7 +251,7 @@ let currentX = 0;
 let currentY = 0;
 let mouseDown = false;
 document.body.addEventListener("mousemove", (e) => {
-  if (mouseDown && e.target != document.querySelector('.actions')) {
+  if (mouseDown && (e.target == document.querySelector('canvas') || e.target == document.querySelector('body'))) {
     pivot_all.rotation.y -= (currentX - e.pageX) / 100;
     pivot_all.rotation.x -= (currentY - e.pageY) / 100;
     currentX = e.pageX;
@@ -257,16 +260,27 @@ document.body.addEventListener("mousemove", (e) => {
   renderer.render(scene, camera);
 })
 document.body.addEventListener("mousedown", (e) => {
-  if (e.target != document.querySelector('.actions')) {
+  if (e.target == document.querySelector('canvas') || e.target == document.querySelector('body')) {
     mouseDown = true;
     currentX = e.pageX;
     currentY = e.pageY;
   }
 })
 document.body.addEventListener("mouseup", (e) => {
-  if (e.target != document.querySelector('.actions')) {
+  if (e.target == document.querySelector('canvas') || e.target == document.querySelector('body')) {
     mouseDown = false;
   }
+})
+document.body.addEventListener("mousewheel", (e) => {
+  console.log(camera.position.z)
+  if (camera.position.z <= 4 && e.deltaY < 0) {
+    camera.position.z = 4
+  } else if (camera.position.z >= 20 && e.deltaY > 0) {
+    camera.position.z = 20
+  } else {
+    camera.position.z += e.deltaY / 100
+  }
+  renderer.render(scene, camera)
 })
 
 pivot_all.rotation.y = 0.7;
